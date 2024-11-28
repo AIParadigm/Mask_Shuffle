@@ -9,8 +9,8 @@ from privacy_utils import gen_grad, gen_hx, gen_mask, add_mask
 def main():
     seed = []
     cipertext = []
-    paillier_pk, paillier_sk = generate_paillier_keypair(n_length=1024)  # Paillier密钥加密种子
-    Q = gmpy2.next_prime(2 ** 64)  # 大于2^64的素数
+    paillier_pk, paillier_sk = generate_paillier_keypair(n_length=1024)
+    Q = gmpy2.next_prime(2 ** 64)
     PRIME = gmpy2.next_prime(2 ** 80)
     random_state = gmpy2.random_state()
     n = 100
@@ -22,7 +22,6 @@ def main():
     st = time.time()
     sum_c = 1
     for c in cipertext:
-        # sum_c *= c
         sum_c = sum_c * c % paillier_pk.nsquare
     sum_p = -(paillier_sk.raw_decrypt(sum_c))
     t = time.time() - st

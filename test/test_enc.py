@@ -5,7 +5,7 @@ import time
 
 
 def main():
-    Q = gmpy2.next_prime(2 ** 64)  # 大于2^64的素数
+    Q = gmpy2.next_prime(2 ** 64)
     PRIME = gmpy2.next_prime(2 ** 80)
     random_state = gmpy2.random_state()
     seed = []

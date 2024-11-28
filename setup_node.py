@@ -9,7 +9,7 @@ from phe.paillier import generate_paillier_keypair
 import sys
 import pickle
 
-class TrustedParty:
+class SetupNode:
     def __init__(self, num_clients):
         self.clients_info = []
         self.num_clients = num_clients
@@ -47,12 +47,10 @@ class TrustedParty:
         all_client_info = copy.deepcopy(self.clients_info)
         for info in self.clients_info:
             if info[0] == client_id:
-                print(f"收到客户端{client_id}的请求")
-                # 查找客户端所在的组并发送信息
+                print(f"receive client {client_id}'s request")
                 for group_index, group in enumerate(self.groups):
                     for client in group:
-                        if client[0] == client_id:  # 检查客户端 ID
-                            # 发送所在组的信息给客户端
+                        if client[0] == client_id:
                             group_info = group
 
                 with self.lock:
@@ -84,7 +82,6 @@ class TrustedParty:
                     "aggregator port": pickle.dumps(1234)
                 }
 
-                # 如果客户端不是 total_sum_holder，添加 group_info
                 if client_id != self.total_sum_holder[0]:
                     response["group_info"] = pickle.dumps([
                         {
@@ -100,7 +97,6 @@ class TrustedParty:
         return None
 
     def get_client_ip(self):
-        # 返回指定客户端的信息（包括公私钥）
         all_client_info = copy.deepcopy(self.clients_info)
         response = {
             "all_clients_info": pickle.dumps([
@@ -115,36 +111,26 @@ class TrustedParty:
     def stop_server(self):
         while self.messages_sent < self.num_clients:
             time.sleep(2)
-        print("初始化完成")
-        pid = os.getpid()  # 获取当前进程的PID
-        os.kill(pid, signal.SIGTERM)  # 主动结束指定ID的程序运行
+        print("setup completed")
+        pid = os.getpid()
+        os.kill(pid, signal.SIGTERM)
 
 
     def run(self):
         self.generate_client_info()
         self.group_clients()
-        print("初始化中...")
+        print("setup start...")
         stop_thread = threading.Thread(target=self.stop_server)
         stop_thread.start()
         server = zerorpc.Server(self)
         server.bind("tcp://0.0.0.0:4241")
         server.run()
 
-        # 结束服务
-        server.stop()  # 停止服务器
-
-
-'''
-python trusted_party.py 100
-'''
-
-
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("用法: python trusted_party.py <客户端数量>")
+        print("usage: python setup_node.py <client num>")
         sys.exit(1)
 
     num_clients = int(sys.argv[1])
-    # num_clients = 21
-    trusted_party = TrustedParty(num_clients)
-    trusted_party.run()
+    setup_node = SetupNode(num_clients)
+    setup_node.run()

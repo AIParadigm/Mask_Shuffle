@@ -9,9 +9,9 @@ from ECIES import *
 
 def gen_grad(len):
     gradients = np.round(np.random.random(len) * 2 - 1, 4)
-    scale_factor = 1e4  # 缩放因子
-    scaled_gradients = gradients * scale_factor  # 将浮点数放大
-    grad = scaled_gradients.astype(np.int32)  # 转换为32位整数
+    scale_factor = 1e4
+    scaled_gradients = gradients * scale_factor
+    grad = scaled_gradients.astype(np.int32)
 
     return grad
 
@@ -30,16 +30,8 @@ def gen_mask(Hx, seed, len, p):
     st = time.time()
     for i in range(len):
         r.append(gmpy2.powmod(gmpy2.mpz(Hx[i]), gmpy2.mpz(seed), p))
-    print(f"powmod: {(time.time()-st)}")
+    # print(f"powmod: {(time.time()-st)}")
     return r
-
-# def add_mask(grad, mask, p):
-#     y = []
-#     # gx = []
-#     for i in range(len(grad)):
-#         gx = gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(grad[i]), p)
-#         y.append(gmpy2.c_mod(gx*mask[i], p))
-#     return y
 
 def add_mask(grad, mask, p):
     y = []
@@ -47,20 +39,18 @@ def add_mask(grad, mask, p):
     st = time.time()
     for i in range(len(grad)):
         gx.append(gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(grad[i]), p))
-    print(f"powmod2: {(time.time()-st)}")
+    # print(f"powmod2: {(time.time()-st)}")
 
     st = time.time()
     for i in range(len(mask)):
         y.append(gmpy2.c_mod((gx[i]*mask[i]), p))
-    print(f"mulmod: {(time.time()-st)}")
+    # print(f"mulmod: {(time.time()-st)}")
     return y
 
 def aggregate_gard(grads, powers, scale, p):
     globalSum = np.ones(len(grads[0])).astype(np.int32)
     for grad in grads:
-        # globalSum = globalSum * grad
         globalSum = globalSum * grad % p
-    # globalSum = globalSum % p
     st = time.time()
     agg_grad = look_up(globalSum, powers, scale, p)
     lt = time.time() - st
@@ -75,7 +65,6 @@ def precompute_powers(x, p):
     st= time.time()
     for i in range(-x, x):
         z = gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(i), p)
-        # result[z]=i
         y = z % x1
         if y in result:
             result[y].append(i)
@@ -99,21 +88,13 @@ def look_up(gx, powers, scale, p):
                 if x == gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(i), p):
                     agg_grad.append(i)
         else:
-            print("聚合梯度有误")
+            print("look up failed")
             sys.exit(1)
 
     return agg_grad
 
-"""
-paillier: enc dec add
-ecies: enc dec
-avc: commit mul open
-powmod
-mulmod
-lookup
-"""
 def main():
-    Q = gmpy2.next_prime(2 ** 64)  # 大于2^64的素数
+    Q = gmpy2.next_prime(2 ** 64)
     PRIME = gmpy2.next_prime(2 ** 80)
     random_state = gmpy2.random_state()
     seed = gmpy2.mpz_random(random_state, Q)
@@ -162,8 +143,6 @@ def main():
     y = [y1, y2]
     powers = precompute_powers(1000000, PRIME)
     z = aggregate_gard(y, powers, 1000000, PRIME)
-
-
 
     print(seed)
     print(decrypted_number)

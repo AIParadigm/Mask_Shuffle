@@ -6,10 +6,10 @@ from privacy_utils import gen_grad, gen_hx, gen_mask, add_mask
 from ECIES import *
 
 def main():
-    paillier_pk, paillier_sk = generate_paillier_keypair(n_length=1024)  # Paillier密钥加密种子
+    paillier_pk, paillier_sk = generate_paillier_keypair(n_length=1024)
     private_key3, public_key3 = make_keypair()
     private_key2, public_key2 = make_keypair()
-    Q = gmpy2.next_prime(2 ** 64)  # 大于2^64的素数
+    Q = gmpy2.next_prime(2 ** 64)
     PRIME = gmpy2.next_prime(2 ** 80)
     random_state = gmpy2.random_state()
 

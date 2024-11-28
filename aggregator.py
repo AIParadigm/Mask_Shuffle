@@ -124,9 +124,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     port = int(sys.argv[1])
-    setup_ip = sys.argv[2]
+    setup_node_ip = sys.argv[2]
     client = zerorpc.Client(timeout=None, heartbeat=None)
-    client.connect(f"tcp://{setup_ip}:4241")
+    client.connect(f"tcp://{setup_node_ip}:4241")
     response = client.get_client_ip()
     clients_info = pickle.loads(response["all_clients_info"])
 

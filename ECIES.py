@@ -8,8 +8,7 @@ from Crypto.Cipher import AES
 import Padding
 import sys
 
-# 设置更高的整数字符串转换位数限制
-sys.set_int_max_str_digits(1000000000)  # 可以根据需要调整这个数字
+sys.set_int_max_str_digits(1000000000)
 
 
 def enc_long(n):
@@ -209,8 +208,6 @@ curve = EllipticCurve(
     h=1,
 )
 
-
-# 封装ecies加密的密文消息
 class Message:
     def __init__(self, text):
         self.R = []
@@ -220,14 +217,10 @@ class Message:
             self.text = text
 
     def encrypt(self, Qa):
-        '''
-        多层加密:加密方在加密时根据自己私钥和解密方公钥计算出对称密钥和R，使用对称密钥进行加密，然后将R存入列表；
-               解密方根据R和自己私钥计算对称密钥进行解密,然后将自己用于计算对称密钥的R从列表中删去
-        '''
         r = random.randint(0, 2 ** 128)
         S = scalar_mult(r, Qa)
         key = hashlib.sha256(str(S[0]).encode()).digest()
-        if isinstance(self.text, bytes):  # 第一次加密时需要将明文转换为字节形式
+        if isinstance(self.text, bytes):
             self.text = encrypt(self.text, key, AES.MODE_ECB)
         else:
             message = Padding.appendPadding(self.text, blocksize=Padding.AES_blocksize, mode=0)
@@ -249,7 +242,7 @@ class Message:
     def deserialize(serialized_obj):
         return pickle.loads(serialized_obj)
 
-# 为每个客户端生成ECIES密钥对
+
 def generate_keys(clients):
     private_keys = {}
     public_keys = {}
@@ -264,7 +257,6 @@ def generate_keys(clients):
 def generate_symmetric_keys(clients, ecc_keys):
     symmetric_keys = {}
     for client in clients:
-        # 私钥r，公钥rG; 根据Qa和r生成对称密钥S
         r = random.randint(0, 2 ** 128)
         rG = scalar_mult(r, curve.g)
         S = scalar_mult(r, ecc_keys[clients[0]]['public_key'])
