@@ -1,0 +1,7 @@
+click==6.2
+cryptography==42.0.5
+gmpy2==2.1.2
+numpy==1.24.3
+Padding==0.5
+pycryptodome==3.20.0
+zerorpc==0.6.3

@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import gmpy2
 from cryptography.hazmat.primitives import hashes
@@ -35,15 +37,72 @@ def mul(c_list, p):
 
     return c_sum
 
+def divide_grad(seed, grad, sub_num):
+
+    np.random.seed(seed)
+    indices = np.random.permutation(len(grad))
+    sub_size = len(grad) // sub_num
+    sub_arrays = []
+
+    for i in range(sub_num):
+        start_idx = i * sub_size
+        end_idx = (i + 1) * sub_size if i < sub_num - 1 else len(grad)
+
+        sub_array = grad[indices[start_idx:end_idx]]
+
+        if i == sub_num - 1 and len(sub_array) < sub_size:
+            padding_size = sub_size - len(sub_array)
+            sub_array = np.pad(sub_array, (0, padding_size), 'constant', constant_values=0)
+
+        sub_arrays.append(sub_array)
+
+    return sub_arrays
+
+def batch_commit(vector, seed, sub_num, g, p):
+    divided_grad = divide_grad(seed, vector, sub_num)
+    batch_vector = np.sum(divided_grad, axis=1)
+    batch_c = commit(batch_vector, g, p)
+
+    return batch_c
+
+def batch_open(c_list, c_sum, p):
+    transposed_list = [list(item) for item in zip(*c_list)]
+    c_mul = []
+    for c in transposed_list:
+        c_mul.append(mul(c, p))
+
+    if c_mul == c_sum:
+        return 1
+    else:
+        return 0
+
+
 def main():
     vector_size = 100000
     x1 = gen_grad(vector_size)
     x2 = gen_grad(vector_size)
     x3 = gen_grad(vector_size)
+    sum_x = np.sum([x1,x2,x3], axis=0)
+    random_int = [random.randint(0, 1000) for _ in range(128)]
 
     PRIME = gmpy2.next_prime(2 ** 80)
-
     g = setup(vector_size)
+
+    c1 = []
+    c2 = []
+    c3 = []
+    c_sum = []
+
+    for seed in random_int:
+        c1.append(batch_commit(x1, seed, 2, g, PRIME))
+        c2.append(batch_commit(x2, seed, 2, g, PRIME))
+        c3.append(batch_commit(x3, seed, 2, g, PRIME))
+        c_sum.append(batch_commit(sum_x, seed, 2, g, PRIME))
+
+    c_list = [c1,c2,c3]
+
+    print(batch_open(c_list, c_sum, PRIME))
+
 
     st = time.time()
     c1 = commit(x1, g, PRIME)
