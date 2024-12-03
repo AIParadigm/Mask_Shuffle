@@ -7,13 +7,13 @@ install_solc("0.8.0")
 import json  # to save the output in a JSON file
 import gmpy2
 
-with open("Contracts/Test_Smart_Contract.sol", "r") as file:
+with open("Contracts/Verification.sol", "r") as file:
     contact_list_file = file.read()
 
 compiled_sol = compile_standard(
     {
         "language": "Solidity",
-        "sources": {"Test_Smart_Contract.sol": {"content": contact_list_file}},
+        "sources": {"Verification.sol": {"content": contact_list_file}},
         "settings": {
             "outputSelection": {
                 "*": {
@@ -30,9 +30,9 @@ compiled_sol = compile_standard(
 with open("compiled_code.json", "w") as file:
     json.dump(compiled_sol, file)
 # get bytecode
-bytecode = compiled_sol["contracts"]["Test_Smart_Contract.sol"]["Test_Smart_Contract"]["evm"]["bytecode"]["object"]
+bytecode = compiled_sol["contracts"]["Verification.sol"]["Verification"]["evm"]["bytecode"]["object"]
 # get abi
-abi = json.loads(compiled_sol["contracts"]["Test_Smart_Contract.sol"]["Test_Smart_Contract"]["metadata"])["output"]["abi"]
+abi = json.loads(compiled_sol["contracts"]["Verification.sol"]["Verification"]["metadata"])["output"]["abi"]
 # Create the contract in Python
 contract = w3.eth.contract(abi=abi, bytecode=bytecode)
 
@@ -56,7 +56,7 @@ def gen_grad(size):
 
 
 # Test multiple candidates
-# python test_smart_contract.py <num of clients> <size of grad>
+# python verification_cost.py <num of clients> <size of grad>
 if __name__ == '__main__':
 
     n = int(sys.argv[1])

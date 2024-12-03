@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-contract Test_Smart_Contract {
+contract Verification {
 
     function modPow(uint256 base, uint256 exponent, uint256 modulus) internal returns (uint256) {
 	    uint256[6] memory input = [32,32,32,base,exponent,modulus];
