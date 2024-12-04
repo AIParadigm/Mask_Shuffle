@@ -6,6 +6,7 @@ from solcx import compile_standard, install_solc
 install_solc("0.8.0")
 import json  # to save the output in a JSON file
 import gmpy2
+import pickle
 
 with open("Contracts/Verification.sol", "r") as file:
     contact_list_file = file.read()
@@ -60,8 +61,8 @@ def gen_grad(size):
 if __name__ == '__main__':
 
     n = int(sys.argv[1])
-    vector_size = int(sys.argv[2])
-    batch_size = int(vector_size/2)
+    d = int(sys.argv[2])
+    batch_size = int(d/2)
 
     P = 1208925819614629174706189
     g1 = 71268528852831316311076975079190540529007687924137045429198239221085821340320
@@ -69,12 +70,19 @@ if __name__ == '__main__':
     g = [g1, g2]
     grads = []
     grads_sum = []
-
+    sum_grad = None
     for i in range(n):
-        grads.append(gen_grad(vector_size))
-        grads_sum.append([np.sum(grads[i][:batch_size]), np.sum(grads[i][batch_size:])])
+        # grads.append(gen_grad(d))
+        # grads_sum.append([np.sum(grads[i][:batch_size]), np.sum(grads[i][batch_size:])])
+        grad = gen_grad(d)
+        grads_sum.append([np.sum(grad[:batch_size]), np.sum(grad[batch_size:])])
+        if i == 0:
+            sum_grad = grad
+        else:
+            sum_grad += grad
     print(f"generate grad complete")
-    sum_grad = np.sum(grads, axis=0)
+    # sum_grad = np.sum(grads, axis=0)
+
     client_commit = []
     for s in grads_sum:
         c_s1 = gmpy2.powmod(gmpy2.mpz(g1), gmpy2.mpz(s[0]), P)
@@ -83,14 +91,22 @@ if __name__ == '__main__':
     print("commit compute complete")
     sum1 = int(np.sum(sum_grad[:batch_size]))
     sum2 = int(np.sum(sum_grad[batch_size:]))
-    sumtosc_cost = Contract.functions.SumtoSC(sum1, sum2).estimate_gas({'from': w3.eth.accounts[0]})
-    print(f"the sum of aggregated grad had been uploaded to smart contract, gas cost: {sumtosc_cost}")
-    # gradtosc_cost = Contract.functions.GradtoSC(sum_grad.tolist()).estimate_gas({'from': w3.eth.accounts[0]})
-    # print(f"the aggregated grad had been uploaded to smart contract, gas cost:{gradtosc_cost}")
+    c_sum1 = int(gmpy2.powmod(gmpy2.mpz(g1), gmpy2.mpz(sum1), P))
+    c_sum2 = int(gmpy2.powmod(gmpy2.mpz(g2), gmpy2.mpz(sum2), P))
+    sumctosc_cost = Contract.functions.SumCtoSC(c_sum1, c_sum2).estimate_gas({'from': w3.eth.accounts[0]})
+    Contract.functions.SumCtoSC(c_sum1, c_sum2).transact({'from': w3.eth.accounts[0]})
+    print(f"the sum of aggregated grad had been uploaded to smart contract, gas cost: {sumctosc_cost}")
     committosc_cost = []
+    communication_cost = []
     for c in client_commit:
         c_list = [int(c[0]), int(c[1])]
         committosc_cost.append(Contract.functions.CommittoSC(c_list).estimate_gas({'from': w3.eth.accounts[0]}))
-    print(f"the commitment had been uploaded to smart contract, gas cost:{committosc_cost}")
+        Contract.functions.CommittoSC(c_list).transact({'from': w3.eth.accounts[0]})
+        message = pickle.dumps(c_list)
+        communication_cost.append(len(message) / 1024 / 1024)
+    print(f"the size of data ingoing to smart contract is: {sum(communication_cost)*128}MB")
+    print(f"the commitment had been uploaded to smart contract")
+    # print(f"the commitment had been uploaded to smart contract, gas cost:{committosc_cost}")
+    print(Contract.functions.verifyCommitment().call({'from': w3.eth.accounts[0]}))
     verify_cost = Contract.functions.verifyCommitment().estimate_gas({'from': w3.eth.accounts[0]})
-    print(f"the gas cost of verification：{verify_cost}")
+    print(f"the gas cost of verification：{verify_cost*128}")
