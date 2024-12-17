@@ -1,4 +1,4 @@
-# LSPFL: Large-Scale Privacy-Preserving Federated Learning based on Mask Shuffling
+# MASH: Large-Scale Privacy-Preserving Federated Learning based on Mask Shuffling
 
 A simple Python implementation of a privacy-preserving aggregation protocol for federated learning.
 
