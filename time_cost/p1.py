@@ -21,17 +21,18 @@ def main():
     ciphertext = Message(encrypted_number)
     ciphertext.encrypt(public_key3)
     ciphertext.encrypt(public_key2)
-    t = time.time() - st
+    # t = time.time() - st
     m_seed = pickle.dumps(ciphertext)
     print(f"seed size: {len(m_seed)/1024} KB")
 
     g = gen_grad(vectorsize)
+    st = time.time()
     hx = gen_hx(vectorsize)
 
     st = time.time()
     r = gen_mask(hx, seed, vectorsize, PRIME)
     y = add_mask(g, r, PRIME)
-    t += (time.time() - st)
+    t = (time.time() - st)
     print(f"P1 time: {t}")
 
     m_y = pickle.dumps(y)

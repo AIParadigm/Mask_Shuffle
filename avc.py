@@ -1,5 +1,4 @@
 import random
-
 import numpy as np
 import gmpy2
 from cryptography.hazmat.primitives import hashes
@@ -38,7 +37,6 @@ def mul(c_list, p):
     return c_sum
 
 def divide_grad(seed, grad, sub_num):
-
     np.random.seed(seed)
     indices = np.random.permutation(len(grad))
     sub_size = len(grad) // sub_num

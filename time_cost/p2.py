@@ -13,7 +13,7 @@ def main():
     PRIME = gmpy2.next_prime(2 ** 80)
     random_state = gmpy2.random_state()
 
-    vectorsize = 10000000
+    vectorsize = 10000
     seed1 = gmpy2.mpz_random(random_state, int(Q))
     seed2 = gmpy2.mpz_random(random_state, int(Q))
 

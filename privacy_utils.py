@@ -7,17 +7,17 @@ import gmpy2
 from phe.paillier import *
 from ECIES import *
 
-def gen_grad(len):
-    gradients = np.round(np.random.random(len) * 2 - 1, 4)
+def gen_grad(vector_size):
+    gradients = np.round(np.random.random(vector_size) * 2 - 1, 4)
     scale_factor = 1e4
     scaled_gradients = gradients * scale_factor
     grad = scaled_gradients.astype(np.int32)
 
     return grad
 
-def gen_hx(len):
+def gen_hx(vector_size):
     Hx = []
-    for i in range(len):
+    for i in range(vector_size):
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
         digest.update(int(i).to_bytes(24, 'big'))
         hx = digest.finalize()
@@ -25,25 +25,18 @@ def gen_hx(len):
         Hx.append(hx_int)
     return Hx
 
-def gen_mask(Hx, seed, len, p):
+def gen_mask(Hx, seed, vector_size, p):
     r = []
     st = time.time()
-    for i in range(len):
+    for i in range(vector_size):
         r.append(gmpy2.powmod(gmpy2.mpz(Hx[i]), gmpy2.mpz(seed), p))
     # print(f"powmod: {(time.time()-st)}")
     return r
 
 def add_mask(grad, mask, p):
     y = []
-    gx = []
-    st = time.time()
-    for i in range(len(grad)):
-        gx.append(gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(grad[i]), p))
-    # print(f"powmod2: {(time.time()-st)}")
-
-    st = time.time()
     for i in range(len(mask)):
-        y.append(gmpy2.c_mod((gx[i]*mask[i]), p))
+        y.append(gmpy2.c_mod((gmpy2.powmod(gmpy2.mpz(2), gmpy2.mpz(grad[i]), p)*mask[i]), p))
     # print(f"mulmod: {(time.time()-st)}")
     return y
 
@@ -131,16 +124,16 @@ def main():
     decrypted_number = paillier_sk.raw_decrypt(text)
     pd = time.time() - st
 
-    vectorsize = 100000
+    vectorsize = 100000000
     x1 = gen_grad(vectorsize)
-    x2 = gen_grad(vectorsize)
+    # x2 = gen_grad(vectorsize)
     hx = gen_hx(vectorsize)
     r1 = gen_mask(hx, seed, vectorsize, PRIME)
-    r2 = gen_mask(hx, seed1, vectorsize, PRIME)
+    # r2 = gen_mask(hx, seed1, vectorsize, PRIME)
     y1 = add_mask(x1, r1, PRIME)
-    y2 = add_mask(x2, r2, PRIME)
+    # y2 = add_mask(x2, r2, PRIME)
 
-    y = [y1, y2]
+    # y = [y1, y2]
     powers = precompute_powers(1000000, PRIME)
     z = aggregate_gard(y, powers, 1000000, PRIME)
 

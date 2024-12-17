@@ -19,27 +19,27 @@ def main():
     hx = gen_hx(vectorsize)
     y = []
     for i in range(n-1):
-        # seed.append(gmpy2.mpz_random(random_state, int(Q)))
+        seed.append(gmpy2.mpz_random(random_state, int(Q)))
         g = gen_grad(vectorsize)
         grad.append(g)
-        # r = gen_mask(hx, seed[i], vectorsize, PRIME)
-        # y.append(np.array(add_mask(g, r, PRIME)))
-        print(f"已生成{i+1}个")
+        r = gen_mask(hx, seed[i], vectorsize, PRIME)
+        y.append(np.array(add_mask(g, r, PRIME)))
+
 
     # seed.append((-(sum(seed))))
-    g = gen_grad(vectorsize)
-    grad.append(g)
+    # g = gen_grad(vectorsize)
+    # grad.append(g)
     # r = gen_mask(hx, seed[-1], vectorsize, PRIME)
     # y.append(np.array(add_mask(g, r, PRIME)))
 
-    # powers = precompute_powers(n * 10000, PRIME)
-    # st = time.time()
-    # sum_gradient = aggregate_gard(y, powers, n * 10000, PRIME)
-    # t = time.time() - st
+    powers = precompute_powers(n * 10000, PRIME)
+    st = time.time()
+    sum_gradient = aggregate_gard(y, powers, n * 10000, PRIME)
+    t = time.time() - st
 
-    sum_gradient = np.sum(grad, axis=0)
-    m_g = pickle.dumps(sum_gradient)
-    print(f"aggregated grad size: {len(m_g) / 1024} KB")
+    # sum_gradient = np.sum(grad, axis=0)
+    # m_g = pickle.dumps(sum_gradient)
+    # print(f"aggregated grad size: {len(m_g) / 1024} KB")
 
     # print(f"Aggregator time: {t}")
     # logging.info(f"Aggregator time: {t}")
