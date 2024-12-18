@@ -7,7 +7,7 @@ A Python implementation of the proposed federated learning framework.
 1. First, we introduce a mask-shuffling scheme for mask seeds, leveraging ECIES and Paillier cryptosystems, to ensure that the sum of all masks equals $\textbf{0}$.
 1. Second, we employ a group-based mask-shuffling scheme to improve client parallelism, thereby enhancing execution efficiency. Additionally, the group-based scheme enables the framework to tolerate client dropouts. 
 1. Third, we utilize exponential operations to obfuscate clients' gradients while avoiding the need to solve the discrete logarithm problem when computing the aggregated gradient.
-1. Fourth, we present a sampling-based verification method that ensures the correctness of the aggregation with high probability and incurs minimal computational overhead.    
+1. Fourth, we present a sampling-based verification method that ensures the correctness of the aggregation with high probability and incurs minimal computational overhead. The verification is accomplished on smart contract.
 
 
 ## Run the project
