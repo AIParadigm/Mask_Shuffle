@@ -9,22 +9,32 @@ This project is an implementation of Mask shuffling FL for Large-Scale Privacy-P
 
 ## Run the project
 
-### Setup 
-
-To initialize initial system parameters, use the following command:
-```commandline
-python setup_node.py 100
+## Setup
+### Usage
+```asp
+python setup_node.py <client_num>
 ```
-You can change the number of clients according to your needs.
+- `<client_num>`: The number of clients (must be an integer).
 
+### Example
+Start a setup node for 10 clients:
+```commandline
+python setup_node.py 10
+```
 
-### Aggregator
+## Aggregator
+### Usage
+```asp
+python aggregator.py <port> <ip address>
+```
+- `<port>`: The port on which the aggregator listens.
+- `<ip address>`: The IP address of the setup node to fetch client information.
 
-The client is a simple python script to interact with the server.
+### Example
+To start an aggregator instance listening on port `1234` and connecting to the setup node at `127.0.0.1`:
 ```commandline
 python aggregator.py 1234 127.0.0.1
 ```
-
 ### Client
 Once both the setup node and aggregator are running, you need to run the following script to start all the clients.
 You can modify the values of `client_count` and `vectorsize` in the script to meet your experimental needs. However, please ensure that the `client_count` matches the number of clients set in the `setup_node` process that you have already started.
