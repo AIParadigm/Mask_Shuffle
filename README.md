@@ -15,14 +15,14 @@ A Python implementation of the proposed federated learning framework.
 ## Setup
 ### Usage
 ```asp
-python setup_node.py <client_num>
+python setup.py <client_num>
 ```
 - `<client_num>`: The number of clients (must be an integer).
 
 ### Example
-Start a setup node for 10 clients:
+Generate initialization parameters for 10 clients:
 ```commandline
-python setup_node.py 10
+python setup.py 10
 ```
 
 ## Aggregator
@@ -31,16 +31,16 @@ python setup_node.py 10
 python aggregator.py <port> <ip address>
 ```
 - `<port>`: The port on which the aggregator listens.
-- `<ip address>`: The IP address of the setup node to fetch client information.
+- `<ip address>`: The IP address for obtaining initialization parameters.
 
 ### Example
-To start an aggregator instance listening on port `9475` and connecting to the setup node at `127.0.0.1`:
+To start an aggregator instance listening on port `9475` and connecting to `127.0.0.1` to obtain initialization parameters:
 ```commandline
 python aggregator.py 9475 127.0.0.1
 ```
 ### Client
-Once both the setup node and aggregator are running, you need to run the following script to start all the clients.
-You can modify the values of `client_count` and `vectorsize` in the script to meet your experimental needs. However, please ensure that the `client_count` matches the number of clients set in the `setup_node` process that you have already started.
+After the aggregator runs successfully and all clients have generated initialization parameters, you need to run the following script to start all the clients.
+You can modify the values of `client_count` and `vectorsize` in the script to meet your experimental needs. However, please ensure that the `client_count` matches the number of clients set in the `setup` process that you have already started.
 
 For windows:
 
