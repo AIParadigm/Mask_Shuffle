@@ -34,9 +34,9 @@ python aggregator.py <port> <ip address>
 - `<ip address>`: The IP address of the setup node to fetch client information.
 
 ### Example
-To start an aggregator instance listening on port `1234` and connecting to the setup node at `127.0.0.1`:
+To start an aggregator instance listening on port `9475` and connecting to the setup node at `127.0.0.1`:
 ```commandline
-python aggregator.py 1234 127.0.0.1
+python aggregator.py 9475 127.0.0.1
 ```
 ### Client
 Once both the setup node and aggregator are running, you need to run the following script to start all the clients.

@@ -22,7 +22,7 @@ class Aggregator:
 
     def start_server(self):
         self.server = zerorpc.Server(self)
-        self.server.bind(f"tcp://0.0.0.0:{8241 + int(self.port)}")
+        self.server.bind(f"tcp://0.0.0.0:{int(self.port)}")
         self.server.run()
 
     def start_client(self, target_id):
@@ -115,7 +115,7 @@ class Aggregator:
         listening_thread.start()
 
 '''
-python aggregator.py 1234 127.0.0.1
+python aggregator.py 9475 127.0.0.1
 '''
 
 if __name__ == "__main__":
