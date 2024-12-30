@@ -8,7 +8,7 @@ set alg=1
 
 set client_count=10
 set vectorsize=100000
-::  python setup_node.py 100
+::  python setup.py 100
 ::  python aggregator.py 1234 127.0.0.1
 
 set CONDA_PATH=C:\ProgramData\anaconda3

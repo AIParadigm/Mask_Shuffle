@@ -134,4 +134,3 @@ if __name__ == "__main__":
 
     aggregator = Aggregator(port, clients_info)
     aggregator.run()
-
