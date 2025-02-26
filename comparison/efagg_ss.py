@@ -5,7 +5,7 @@ import hashlib
 import gmpy2
 import sympy
 from typing import Dict, Tuple
-from nacl.bindings import crypto_scalarmult_base, crypto_scalarmult
+from nacl.bindings import crypto_scalarmult_base
 
 # Curve25519
 CURVE_ORDER = 2 ** 255 - 19
@@ -25,11 +25,6 @@ def random_scalar() -> int:
     return int.from_bytes(scalar, "little")
 
 
-def scalarmult(scalar: int, point: bytes) -> bytes:
-    """ Curve25519 scalar multiplication (used for generating commitment values) """
-    return crypto_scalarmult(scalar.to_bytes(32, "little"), point)
-
-
 def ss_share_secret(secret: int, n: int, t: int):
     """ VSS using Curve25519 """
     coefficients = [secret] + [random_scalar() for _ in range(t - 1)]
@@ -41,18 +36,6 @@ def ss_share_secret(secret: int, n: int, t: int):
     shares = {x: f(x) for x in range(1, n + 1)}
 
     return shares
-
-
-def vss_verify(gs: Dict[int, bytes], comj: Dict[int, bytes]) -> bool:
-    """ Verify VSS shares """
-    for i in gs:
-        x = b'\x00' * 32  # Initialize Curve25519 zero point
-        for j in comj:
-            x = crypto_scalarmult(pow(i, j, CURVE_ORDER).to_bytes(32, "little"), comj[j])
-        if gs[i] != x:
-            return False
-    print("vss_verify:", True)
-    return True
 
 
 def lagrange_coefficient(i: int, keys) -> int:
